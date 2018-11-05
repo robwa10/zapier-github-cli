@@ -2,7 +2,6 @@ const getAccessToken = (z, bundle) => {
   const promise = z.request(`{{process.env.AUTH_URL}}/access_token`, {
     method: 'POST',
     body: {
-      //extra data pulled from the users query string
       code: bundle.inputData.code,
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
@@ -26,16 +25,11 @@ const getAccessToken = (z, bundle) => {
   });
 };
 
-const testAuth = (z /*, bundle*/) => {
-  // Normally you want to make a request to an endpoint that is either specifically designed to test auth, or one that
-  // every user will have access to, such as an account or profile endpoint like /me.
+const testAuth = (z) => {
   const promise = z.request({
     method: 'GET',
     url: 'https://api.github.com/user',
   });
-
-  // This method can return any truthy value to indicate the credentials are valid.
-  // Raise an error to show
   return promise.then((response) => {
     if (response.status === 401) {
       throw new Error('The access token you supplied is not valid');
@@ -71,6 +65,6 @@ module.exports = {
   // The test method allows Zapier to verify that the access token is valid. We'll execute this
   // method after the OAuth flow is complete to ensure everything is setup properly.
   test: testAuth,
-  // assuming "username" is a key returned from the test
+  // Label the connection with their Github username.
   connectionLabel: '{{login}}'
 };
