@@ -3,11 +3,11 @@
 */
 
 // fetch complete list of repositorys
-// results limted to 50, use pagination to retrieve more
+// results limted to 100, use pagination to retrieve more
 const listRepositoriesQuery = `
-  query {
-    user(login:robwa10) {
-      repositories(first:50 after:$repoCursor) {
+  query($userName:String!) {
+    user(login:$userName) {
+      repositories(first:100) {
         pageInfo {
           hasNextPage
           endCursor

@@ -7,13 +7,13 @@ const listRepositorys = (z, bundle) => {
   const promise = z.request('https://api.github.com/graphql', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({query: Queries.listRepositoriesQuery}),
+    body: z.JSON.stringify({
+      query: Queries.listRepositoriesQuery,
+      variables: {userName: bundle.authData.login}
+    }),
   });
-
 /*
  * TODO:
- * Pass authed username into query
- *
  * Check for "hasNextPage" = true
  * Fetch more results if true
  */
