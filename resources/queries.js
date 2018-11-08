@@ -24,6 +24,14 @@ const listRepositoriesQuery = `
 						pushedAt
 						updatedAt
 						url
+						hasWikiEnabled
+						sshUrl
+						isPrivate
+						resourcePath
+						owner {
+							login
+							url
+						}
           }
         }
       }
