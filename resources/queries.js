@@ -8,7 +8,7 @@ const listRepositoriesQuery = `
   query($userName:String!) {
     user(login:$userName) {
       repositories(first:100, orderBy: {
-				direction: ASC,
+				direction: DESC,
 				field: CREATED_AT
       }) {
         pageInfo {
