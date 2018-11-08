@@ -7,7 +7,10 @@
 const listRepositoriesQuery = `
   query($userName:String!) {
     user(login:$userName) {
-      repositories(first:100) {
+      repositories(first:100, orderBy: {
+				direction: ASC,
+				field: CREATED_AT
+      }) {
         pageInfo {
           hasNextPage
           endCursor
