@@ -2,9 +2,10 @@
 * Repository Queries
 */
 
-// fetch complete list of repositorys
-// results limted to 100, use pagination to retrieve more
-const listRepositoriesQuery = `
+// Fetch complete list of repositorys.
+// Github limits results to 100.
+// Since we can sort by CREATED_AT this should be enough for dedupe.
+const repoListQuery = `
   query($userName:String!) {
     user(login:$userName) {
       repositories(first:100, orderBy: {
@@ -42,7 +43,7 @@ const listRepositoriesQuery = `
 }`;
 
 const Queries = {
-    listRepositoriesQuery: listRepositoriesQuery,
+    repoListQuery: repoListQuery,
 };
 
 module.exports = Queries;

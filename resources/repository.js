@@ -4,24 +4,25 @@ const mutations = require('./mutations');
 
 // Fetch a list of repositorys
 const listRepositorys = (z, bundle) => {
-  const promise = z.request('https://api.github.com/graphql', {
+  const promise = z.request(`{{process.env.BASE_URL}}`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: z.JSON.stringify({
-      query: Queries.listRepositoriesQuery,
-      variables: {userName: bundle.authData.login}
+      query: Queries.repoListQuery,
+      variables: { userName: bundle.authData.login },
     }),
   });
-/*
- * TODO:
- * Check for "hasNextPage" = true
- * Fetch more results if true
- */
+
   return promise.then((response) => {
-    const result = JSON.parse(response.content);
+    if (response.status !== 200) {
+      throw new Error('Unable to fetch repos: ' + response.content);
+    }
+    return z.JSON.parse(response.content);
+  }).then ((response) => {
     let data = [];
-    const repos = result.data.user.repositories.edges;
-    repos.forEach((el) => (data.push({
+    const edges = response.data.user.repositories.edges;
+
+    edges.forEach((el) => (data.push({
       id: el.node.id,
       name: el.node.name,
       url: el.node.url,
@@ -30,9 +31,19 @@ const listRepositorys = (z, bundle) => {
       hasIssuesEnabled: el.node.hasIssuesEnabled,
       isPrivate: el.node.isPrivate,
       isFork: el.node.isFork,
+      pushedAt: el.node.pushedAt,
+  		updatedAt: el.node.updatedAt,
+  		url: el.node.url,
+  		hasWikiEnabled: el.node.hasWikiEnabled,
+  		sshUrl: el.node.sshUrl,
+  		isPrivate: el.node.isPrivate,
+  		resourcePath: el.node.resourcePath,
+      owner: el.node.owner.login,
+      ownerUrl: el.node.owner.url,
     })));
+
     return data;
-  })
+  });
 };
 
 module.exports = {
@@ -45,7 +56,7 @@ module.exports = {
       description: 'Lists the repositorys.'
     },
     operation: {
-      perform: listRepositorys
+      type: 'polling', perform: listRepositorys
     }
   },
 
@@ -55,3 +66,4 @@ module.exports = {
   },
 
 };
+``
