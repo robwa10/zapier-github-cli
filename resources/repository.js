@@ -2,14 +2,13 @@
 const Queries = require('./queries');
 const mutations = require('./mutations');
 
-// Fetch a list of repositorys
-const listRepositorys = (z, bundle) => {
+const fetchAndParseData = (z, bundle, query, variables) => {
   const promise = z.request(`{{process.env.BASE_URL}}`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: z.JSON.stringify({
-      query: Queries.repoListQuery,
-      variables: { userName: bundle.authData.login },
+      query: query,
+      variables: variables,
     }),
   });
 
@@ -18,7 +17,15 @@ const listRepositorys = (z, bundle) => {
       throw new Error('Unable to fetch repos: ' + response.content);
     }
     return z.JSON.parse(response.content);
-  }).then ((response) => {
+  })
+};
+
+// Fetch a list of repositorys
+const listRepositorys = (z, bundle) => {
+  const query = Queries.repoListQuery;
+  const variables = { userName: bundle.authData.login };
+
+  return fetchAndParseData(z, bundle, query, variables).then((response) => {
     let data = [];
     const edges = response.data.user.repositories.edges;
 
