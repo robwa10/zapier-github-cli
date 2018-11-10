@@ -54,7 +54,8 @@ const listRepositorys = (z, bundle) => {
           userName: bundle.authData.login,
           endCursor: repositories.pageInfo.endCursor
         }
-        fooBar(z, bundle, Queries.queryB, variables, results)
+        let query = Queries.repoListQuery(true);
+        fooBar(z, bundle, query, variables, results)
       }
 
       return buildList(results)
@@ -62,11 +63,11 @@ const listRepositorys = (z, bundle) => {
     })
   };
 
-  const query = Queries.repoListQuery;
+  const query = Queries.repoListQuery(false);
   const variables = { userName: bundle.authData.login };
 
   return fooBar(z, bundle, query, variables, [])
-  
+
 };
 
 module.exports = {
