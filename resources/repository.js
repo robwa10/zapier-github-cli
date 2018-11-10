@@ -2,34 +2,13 @@
 const Queries = require('./queries');
 const mutations = require('./mutations');
 
-const fetchAndParseData = (z, bundle, query, variables) => {
-  const promise = z.request(`{{process.env.BASE_URL}}`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: z.JSON.stringify({
-      query: query,
-      variables: variables,
-    }),
-  });
-
-  return promise.then((response) => {
-    if (response.status !== 200) {
-      throw new Error('Unable to fetch repos: ' + response.content);
-    }
-    return z.JSON.parse(response.content);
-  })
-};
-
 // Fetch a list of repositorys
 const listRepositorys = (z, bundle) => {
-  const query = Queries.repoListQuery;
-  const variables = { userName: bundle.authData.login };
 
-  return fetchAndParseData(z, bundle, query, variables).then((response) => {
+  const buildList = (results) => {
     let data = [];
-    const edges = response.data.user.repositories.edges;
 
-    edges.forEach((el) => (data.push({
+    results.forEach((el) => (data.push({
       id: el.node.id,
       name: el.node.name,
       url: el.node.url,
@@ -39,18 +18,55 @@ const listRepositorys = (z, bundle) => {
       isPrivate: el.node.isPrivate,
       isFork: el.node.isFork,
       pushedAt: el.node.pushedAt,
-  		updatedAt: el.node.updatedAt,
-  		url: el.node.url,
-  		hasWikiEnabled: el.node.hasWikiEnabled,
-  		sshUrl: el.node.sshUrl,
-  		isPrivate: el.node.isPrivate,
-  		resourcePath: el.node.resourcePath,
+      updatedAt: el.node.updatedAt,
+      url: el.node.url,
+      hasWikiEnabled: el.node.hasWikiEnabled,
+      sshUrl: el.node.sshUrl,
+      isPrivate: el.node.isPrivate,
+      resourcePath: el.node.resourcePath,
       owner: el.node.owner.login,
       ownerUrl: el.node.owner.url,
     })));
 
     return data;
-  });
+  }
+
+  const fooBar = (z, bundle, query, variables, anArray) => {
+    const promise = z.request(`{{process.env.BASE_URL}}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: z.JSON.stringify({
+        query: query,
+        variables: variables,
+      }),
+    });
+
+    return promise.then((response) => {
+      if (response.status !== 200) {
+        throw new Error('Unable to fetch repos: ' + response.content);
+      }
+      const content = z.JSON.parse(response.content);
+      const repositories = content.data.user.repositories;
+      let results = anArray.concat(repositories.edges)
+
+      if (repositories.pageInfo.hasNextPage) {
+        const variables = {
+          userName: bundle.authData.login,
+          endCursor: repositories.pageInfo.endCursor
+        }
+        fooBar(z, bundle, Queries.queryB, variables, results)
+      }
+
+      return buildList(results)
+
+    })
+  };
+
+  const query = Queries.repoListQuery;
+  const variables = { userName: bundle.authData.login };
+
+  return fooBar(z, bundle, query, variables, [])
+  
 };
 
 module.exports = {
@@ -73,4 +89,3 @@ module.exports = {
   },
 
 };
-``
