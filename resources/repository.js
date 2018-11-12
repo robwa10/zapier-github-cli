@@ -3,9 +3,9 @@ const Queries = require('./queries');
 const mutations = require('./mutations');
 
 // Fetch a list of repositorys
-const listRepositorys = (z, bundle) => {
+const getRepositories = (z, bundle) => {
 
-  const buildList = (results) => {
+  const buildRepoList = (results) => {
     let data = [];
 
     results.forEach((el) => (data.push({
@@ -31,7 +31,7 @@ const listRepositorys = (z, bundle) => {
     return data;
   }
 
-  const fooBar = (z, bundle, query, variables, anArray) => {
+  const fetchRepos = (z, bundle, query, variables, anArray) => {
     const promise = z.request(`{{process.env.BASE_URL}}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -55,10 +55,10 @@ const listRepositorys = (z, bundle) => {
           endCursor: repositories.pageInfo.endCursor
         }
         let query = Queries.repoListQuery(true);
-        fooBar(z, bundle, query, variables, results)
+        fetchRepos(z, bundle, query, variables, results)
       }
 
-      return buildList(results)
+      return buildRepoList(results)
 
     })
   };
@@ -66,7 +66,7 @@ const listRepositorys = (z, bundle) => {
   const query = Queries.repoListQuery(false);
   const variables = { userName: bundle.authData.login };
 
-  return fooBar(z, bundle, query, variables, [])
+  return fetchRepos(z, bundle, query, variables, [])
 
 };
 
@@ -80,7 +80,7 @@ module.exports = {
       description: 'Lists the repositorys.'
     },
     operation: {
-      type: 'polling', perform: listRepositorys
+      type: 'polling', perform: getRepositorys
     }
   },
 
@@ -88,5 +88,4 @@ module.exports = {
     id: 1,
     name: 'Test'
   },
-
 };
