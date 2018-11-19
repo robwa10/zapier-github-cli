@@ -1,4 +1,5 @@
 // Dependencies
+const IssuesResource = require('./resources/issues');
 const RepositoryResource = require('./resources/repository');
 const authentication = require('./authentication');
 
@@ -27,6 +28,7 @@ const App = {
   ],
 
   resources: {
+    [IssuesResource.key]: IssuesResource,
     [RepositoryResource.key]: RepositoryResource,
   },
 
