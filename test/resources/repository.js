@@ -8,7 +8,7 @@ const App = require('../../index');
 const appTester = zapier.createAppTester(App);
 zapier.tools.env.inject();
 
-describe('My App', () => {
+describe('Repositories Tests', () => {
   it('should run resources.repository', done => {
     const bundle = { inputData: {} };
 

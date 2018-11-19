@@ -1,6 +1,7 @@
 require('should');
 
 const zapier = require('zapier-platform-core');
+zapier.tools.env.inject();
 
 const App = require('../index');
 const appTester = zapier.createAppTester(App);
@@ -31,7 +32,7 @@ describe('oauth2 app', () => {
 
     return appTester(App.authentication.oauth2Config.authorizeUrl, bundle)
       .then((authorizeUrl) => {
-        authorizeUrl.should.eql('https://auth-json-server.zapier.ninja/oauth/authorize?client_id=1234&state=4444&redirect_uri=http%3A%2F%2Fzapier.com%2F&response_type=code');
+        authorizeUrl.should.eql(`https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&state=4444&redirect_uri=http%3A%2F%2Fzapier.com%2F&response_type=code`);
       });
   });
 
@@ -59,36 +60,14 @@ describe('oauth2 app', () => {
 
     return appTester(App.authentication.oauth2Config.getAccessToken, bundle)
       .then((result) => {
-        result.access_token.should.eql('a_token');
-        result.refresh_token.should.eql('a_refresh_token');
-      });
-  });
-
-  it('can refresh the access token', () => {
-    const bundle = {
-      // In production, Zapier provides these. For testing, we have hard-coded them.
-      // When writing tests for your own app, you should consider exporting them and doing process.env.MY_ACCESS_TOKEN
-      authData: {
-        access_token: 'a_token',
-        refresh_token: 'a_refresh_token'
-      },
-      environment: {
-        CLIENT_ID: process.env.CLIENT_ID,
-        CLIENT_SECRET: process.env.CLIENT_SECRET
-      }
-    };
-
-    return appTester(App.authentication.oauth2Config.refreshAccessToken, bundle)
-      .then((result) => {
-        result.access_token.should.eql('a_new_token');
+        result.access_token.should.eql('a_token')
       });
   });
 
   it('includes the access token in future requests', () => {
     const bundle = {
       authData: {
-        access_token: 'a_token',
-        refresh_token: 'a_refresh_token'
+        access_token: 'a_token'
       },
     };
 
