@@ -1,73 +1,35 @@
 // Dependencies
-const Queries = require('./queries');
-const mutations = require('./mutations');
+const queries = require('./queries/repo_queries');
+const helpers = require('./utils/helpers');
+const samples = require('./samples/repo_samples');
 
 // Fetch a list of repositorys
-const getRepositories = (z, bundle) => {
-
-  const buildRepoList = (results) => {
-    let data = [];
-
-    results.forEach((el) => (data.push({
-      id: el.node.id,
-      name: el.node.name,
-      url: el.node.url,
-      description: el.node.description,
-      createdAt: el.node.createdAt,
-      hasIssuesEnabled: el.node.hasIssuesEnabled,
-      isPrivate: el.node.isPrivate,
-      isFork: el.node.isFork,
-      pushedAt: el.node.pushedAt,
-      updatedAt: el.node.updatedAt,
-      url: el.node.url,
-      hasWikiEnabled: el.node.hasWikiEnabled,
-      sshUrl: el.node.sshUrl,
-      isPrivate: el.node.isPrivate,
-      resourcePath: el.node.resourcePath,
-      owner: el.node.owner.login,
-      ownerUrl: el.node.owner.url,
-    })));
-
-    return data;
-  }
-
-  const fetchRepos = (z, bundle, query, variables, anArray) => {
-    const promise = z.request(`{{process.env.BASE_URL}}`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: z.JSON.stringify({
-        query: query,
-        variables: variables,
-      }),
-    });
-
-    return promise.then((response) => {
-      if (response.status !== 200) {
-        throw new Error('Unable to fetch repos: ' + response.content);
-      }
-      const content = z.JSON.parse(response.content);
-      const repositories = content.data.user.repositories;
-      let results = anArray.concat(repositories.edges)
-
-      if (repositories.pageInfo.hasNextPage) {
-        const variables = {
-          userName: bundle.authData.login,
-          endCursor: repositories.pageInfo.endCursor
-        }
-        let query = Queries.repoListQuery(true);
-        fetchRepos(z, bundle, query, variables, results)
-      }
-
-      return buildRepoList(results)
-
-    })
-  };
-
-  const query = Queries.repoListQuery(false);
+const listRepositories = (z, bundle) => {
+  const amount = bundle.meta.frontend || bundle.meta.first_poll ? 100 : 20;  // Get the max number we can on dedupe and testing in editor
+  const query = queries.repoListQuery(amount);
   const variables = { userName: bundle.authData.login };
 
-  return fetchRepos(z, bundle, query, variables, [])
+  const promise = helpers.queryPromise(z, query, variables);
 
+  return promise.then((response) => {
+    helpers.handleError(response);  // Check for errors and deal with them.
+    const content = z.JSON.parse(response.content); // Parse the content and get the array of nodes
+    const edges = content.data.user.repositories.edges;
+
+    if (bundle.meta.frontend || bundle.meta.first_poll) {
+      return edges.map(el => (el.node));  // Return everything in trigger test or when building dedupe list
+    } else {
+      // Return only repos created in the last 48hrs in standard poll
+      let data = [];
+      edges.forEach(el => {
+        let node = helpers.createdLastTwoDays(el);
+        if (node !== null) {
+          data.push(node);
+        }
+      });
+      return data;
+    };
+  });
 };
 
 module.exports = {
@@ -77,15 +39,12 @@ module.exports = {
   list: {
     display: {
       label: 'New Repository',
-      description: 'Lists the repositorys.'
+      description: 'Triggers when a new repository is created.'
     },
     operation: {
-      type: 'polling', perform: getRepositorys
+      type: 'polling',
+      perform: listRepositories,
+      sample: samples.repoTriggerSample,
     }
-  },
-
-  sample: {
-    id: 1,
-    name: 'Test'
   },
 };
