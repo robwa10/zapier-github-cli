@@ -52,7 +52,7 @@ const searchRepositories = (z, bundle) => {
       // The data is very nested so let's map over edges of labels, languages and assignableUsers and return them as an array of objects
       repository.labels = repository.labels.edges.map(el => el.node);
       repository.languages = repository.languages.edges.map(el => el.node);
-      repository.assignableUsers = repository.assignableUsers.edges.map(el => el.node);
+      repository.collaborators = repository.collaborators.edges.map(el => el.node);
 
       return [repository]
     }

@@ -59,7 +59,7 @@ samples.repoSearchSample = {
       name: 'JavaScript'
     }
   ],
-  assignableUsers: [
+  collaborators: [
     {
       email: 'fake@email.com',
       name: 'John Doe',

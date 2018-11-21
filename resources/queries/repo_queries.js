@@ -74,7 +74,7 @@ const findRepoQuery = `
           }
         }
       }
-      assignableUsers(first:20) {
+      collaborators(first:20) {
         edges {
           node {
             email
