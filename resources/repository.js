@@ -12,7 +12,7 @@ const listRepositories = (z, bundle) => {
   const promise = helpers.queryPromise(z, query, variables);
 
   return promise.then((response) => {
-    helpers.handleError(response);  // Check for errors and deal with them.
+    helpers.handleError(response);  // Check for errors and deal with them
     const content = z.JSON.parse(response.content); // Parse the content and get the array of nodes
     const edges = content.data.user.repositories.edges;
 
@@ -32,6 +32,33 @@ const listRepositories = (z, bundle) => {
   });
 };
 
+// Find a specific repository
+const searchRepositories = (z, bundle) => {
+  // Check if Organization or User Name included, if not default to authed login
+  const repoOwner = bundle.inputData.owner || bundle.authData.login;
+  const query = queries.findRepoQuery;
+  const variables = { repoOwner, repoName: bundle.inputData.repoName };
+
+  const promise = helpers.queryPromise(z, query, variables);
+
+  return promise.then((response) => {
+    helpers.handleError(response);
+    const content = z.JSON.parse(response.content);
+    let repository = content.data.repository;
+
+    if (repository === null) {
+      return [{}] // Don't try and .map() null, just return it an empty object to show there's no match
+    } else {
+      // The data is very nested so let's map over edges of labels, languages and assignableUsers and return them as an array of objects
+      repository.labels = repository.labels.edges.map(el => el.node);
+      repository.languages = repository.languages.edges.map(el => el.node);
+      repository.assignableUsers = repository.assignableUsers.edges.map(el => el.node);
+
+      return [repository]
+    }
+  });
+};
+
 module.exports = {
   key: 'repository',
   noun: 'Repository',
@@ -46,5 +73,30 @@ module.exports = {
       perform: listRepositories,
       sample: samples.repoTriggerSample,
     }
+  },
+
+  search: {
+    display: {
+      label: 'Find Repository',
+      description: 'Find a specific repository.'
+    },
+    operation: {
+      inputFields: [
+        {
+          key: 'owner',
+          required: false,
+          label: 'Organization or User Name',
+          helpText: 'What follows directly after `https://github.com/`. Defaults to the connected account.'
+        },
+        {
+          key: 'repoName',
+          required: true,
+          label: 'Repository Name',
+          helpText: 'What follows directly after `https://github.com/:owner/`.'
+        },
+      ],
+      perform: searchRepositories,
+      sample: samples.repoSearchSample,
+    },
   },
 };

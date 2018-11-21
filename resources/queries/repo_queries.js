@@ -39,6 +39,55 @@ const repoListQuery = (fetchAmount) => {
       }`;
 }
 
+const findRepoQuery = `
+  query( $repoName:String!, $repoOwner:String!) {
+    repository(name:$repoName, owner:$repoOwner) {
+      name
+      id
+      createdAt
+      description
+      descriptionHTML
+      hasIssuesEnabled
+      homepageUrl
+      isFork
+      isPrivate
+      pushedAt
+      updatedAt
+      sshUrl
+      url
+      languages(first:20) {
+        edges {
+          node {
+            id
+            name
+          }
+        }
+      }
+      labels(first:20) {
+        edges {
+          node {
+            id
+            color
+            name
+            resourcePath
+            url
+          }
+        }
+      }
+      assignableUsers(first:20) {
+        edges {
+          node {
+            email
+            name
+            login
+            url
+          }
+        }
+      }
+    }
+  }`;
+
 module.exports = {
     repoListQuery: repoListQuery,
+    findRepoQuery: findRepoQuery,
 };
