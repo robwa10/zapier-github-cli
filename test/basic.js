@@ -6,6 +6,8 @@ zapier.tools.env.inject();
 const App = require('../index');
 const appTester = zapier.createAppTester(App);
 
+const nock = require('nock');
+
 describe('oauth2 app', () => {
   before(() => {
     // It's a good idea to store your Client ID and Secret in the environment rather than in code.
@@ -36,45 +38,46 @@ describe('oauth2 app', () => {
       });
   });
 
-  it('can fetch an access token', () => {
+  it('can fetch an access token and user name', done => {
     const bundle = {
       inputData: {
         // In production, Zapier passes along whatever code your API set in the query params when it redirects
         // the user's browser to the `redirect_uri`
         code: 'one_time_code',
       },
+      authData: {
+        access_token: 'a_token',
+      },
       environment: {
         CLIENT_ID: process.env.CLIENT_ID,
         CLIENT_SECRET: process.env.CLIENT_SECRET
-      },
-      cleanedRequest: {
-        querystring: {
-          accountDomain: 'test-account',
-          code: 'one_time_code'
-        }
-      },
-      rawRequest: {
-        querystring: "?accountDomain=test-account&code=one_time_code"
       }
     };
 
-    return appTester(App.authentication.oauth2Config.getAccessToken, bundle)
-      .then((result) => {
-        result.access_token.should.eql('a_token')
-      });
-  });
+    // Intercept the call to get the access token
+    nock('https://github.com/login/oauth')
+      .post('/access_token', {
+        code: 'one_time_code',
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        grant_type: 'authorization_code',
+      })
+      .reply(200, { access_token: 'a_token' });
 
-  it('includes the access token in future requests', () => {
-    const bundle = {
-      authData: {
-        access_token: 'a_token'
-      },
-    };
+    // Intercept the call the get the user name
+    nock('https://api.github.com')
+      .get('/user')
+      .query({ access_token: bundle.authData.access_token })
+      .reply(200, { login: 'user001' });
 
-    return appTester(App.authentication.test, bundle)
+    appTester(App.authentication.oauth2Config.getAccessToken, bundle)
       .then((result) => {
-        result.should.have.property('username');
-        result.username.should.eql('Bret');
-      });
+        result.should.eql({
+          access_token: 'a_token',
+          login: 'user001',
+        })
+        done()
+      })
+      .catch(done);
   });
 });
