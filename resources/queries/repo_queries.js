@@ -11,7 +11,6 @@ const repoListQuery = (fetchAmount) => {
             direction: DESC,
             field: CREATED_AT })
             {
-          totalCount
             edges {
               node {
                 id
