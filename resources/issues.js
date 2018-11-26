@@ -1,70 +1,26 @@
-// get a single issues
-const getIssues = (z, bundle) => {
-  const responsePromise = z.request({
-    url: `https://jsonplaceholder.typicode.com/posts/${bundle.inputData.id}`,
-  });
-  return responsePromise
-    .then(response => z.JSON.parse(response.content));
-};
-
 // get a list of issuess
-const listIssuess = (z) => {
-  const responsePromise = z.request({
-    url: 'https://jsonplaceholder.typicode.com/posts',
-    params: {
-      order_by: 'id desc'
-    }
-  });
-  return responsePromise
-    .then(response => z.JSON.parse(response.content));
+const listIssuess = (z, bundle) => {
+  return []
 };
 
 // find a particular issues by name
 const searchIssuess = (z, bundle) => {
-  const responsePromise = z.request({
-    url: 'https://jsonplaceholder.typicode.com/posts',
-    params: {
-      query: `name:${bundle.inputData.name}`
-    }
-  });
-  return responsePromise
-    .then(response => z.JSON.parse(response.content));
+  return []
 };
 
 // create a issues
 const createIssues = (z, bundle) => {
-  const responsePromise = z.request({
-    method: 'POST',
-    url: 'https://jsonplaceholder.typicode.com/posts',
-    body: {
-      name: bundle.inputData.name // json by default
-    }
-  });
-  return responsePromise
-    .then(response => z.JSON.parse(response.content));
+  return []
 };
 
 module.exports = {
   key: 'issues',
   noun: 'Issues',
 
-  get: {
-    display: {
-      label: 'Get Issues',
-      description: 'Gets a issues.'
-    },
-    operation: {
-      inputFields: [
-        {key: 'id', required: true}
-      ],
-      perform: getIssues
-    }
-  },
-
   list: {
     display: {
-      label: 'New Issues',
-      description: 'Lists the issuess.'
+      label: 'New Issue',
+      description: 'Triggers when a new issue is created.'
     },
     operation: {
       perform: listIssuess
@@ -74,7 +30,7 @@ module.exports = {
   search: {
     display: {
       label: 'Find Issues',
-      description: 'Finds a issues by searching.'
+      description: 'Finds a spsecific issue.'
     },
     operation: {
       inputFields: [
@@ -96,14 +52,4 @@ module.exports = {
       perform: createIssues
     },
   },
-
-  sample: {
-    id: 1,
-    name: 'Test'
-  },
-
-  outputFields: [
-    {key: 'id', label: 'ID'},
-    {key: 'name', label: 'Name'}
-  ]
 };
