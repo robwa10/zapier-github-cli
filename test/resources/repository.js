@@ -1,116 +1,18 @@
+// Module Imports
+const nock = require('nock');
 const should = require('should');
 const zapier = require('zapier-platform-core');
 
-const query = require('../../resources/queries/repo_queries');
-
-const today = new Date();
-const currentISODate = today.toISOString();
-
-const newRepoQuery = {
-  data: {
-    user: {
-      repositories: {
-        edges: [
-          {
-            node: {
-              id: 12389087628756,
-              name: 'Sample',
-              createdAt: currentISODate,
-              description: 'A sample repo description.',
-              hasIssuesEnabled: false,
-              isPrivate: false,
-              isFork: false,
-              pushedAt: '2018-09-14T14:46:00Z',
-              url: 'https://github.com/user001/sample',
-              hasWikiEnabled: false,
-              sshUrl: 'git@github.com:user001/sample.git',
-              resourcePath: '/user001/sample',
-              owner: {
-                login: 'user001',
-                url: 'https://github.com/user001'
-              }
-            }
-          }
-        ]
-      }
-    }
-  }
-}
-
-const newRepoData = [{
-  id: 12389087628756,
-  name: 'Sample',
-  createdAt: currentISODate,
-  description: 'A sample repo description.',
-  hasIssuesEnabled: false,
-  isPrivate: false,
-  isFork: false,
-  pushedAt: '2018-09-14T14:46:00Z',
-  url: 'https://github.com/user001/sample',
-  hasWikiEnabled: false,
-  sshUrl: 'git@github.com:user001/sample.git',
-  resourcePath: '/user001/sample',
-  owner: {
-      login: 'user001',
-      url: 'https://github.com/user001'
-  }
-}];
-
-const oldRepoQuery = {
-  data: {
-    user: {
-      repositories: {
-        edges: [
-          {
-            node: {
-              id: 12389087628756,
-              name: 'Sample',
-              createdAt: '2018-09-14T14:46:00Z',
-              description: 'A sample repo description.',
-              hasIssuesEnabled: false,
-              isPrivate: false,
-              isFork: false,
-              pushedAt: '2018-09-14T14:46:00Z',
-              url: 'https://github.com/user001/sample',
-              hasWikiEnabled: false,
-              sshUrl: 'git@github.com:user001/sample.git',
-              resourcePath: '/user001/sample',
-              owner: {
-                login: 'user001',
-                url: 'https://github.com/user001'
-              }
-            }
-          }
-        ]
-      }
-    }
-  }
-}
-
-const oldRepoData = [{
-  id: 12389087628756,
-  name: 'Sample',
-  createdAt: '2018-09-14T14:46:00Z',
-  description: 'A sample repo description.',
-  hasIssuesEnabled: false,
-  isPrivate: false,
-  isFork: false,
-  pushedAt: '2018-09-14T14:46:00Z',
-  url: 'https://github.com/user001/sample',
-  hasWikiEnabled: false,
-  sshUrl: 'git@github.com:user001/sample.git',
-  resourcePath: '/user001/sample',
-  owner: {
-      login: 'user001',
-      url: 'https://github.com/user001'
-  }
-}];
-
-// Use this to make test calls into your app:
+// Use this to make test calls
 const App = require('../../index');
 const appTester = zapier.createAppTester(App);
 zapier.tools.env.inject();
-const nock = require('nock');
+
+// Imported Test Data
+const query = require('../../resources/queries/repo_queries');
+const mockData = require('../mock_data/repo_data');
+
+
 
 describe('Repositories Tests', () => {
   describe('New repository trigger', () => {
@@ -131,11 +33,11 @@ describe('Repositories Tests', () => {
         query: query.repoListQuery(100),
         variables: { userName: 'user001'},
       })
-      .reply(200, JSON.stringify(oldRepoQuery));
+      .reply(200, JSON.stringify(mockData.oldRepoQuery));
 
       appTester(App.resources.repository.list.operation.perform, bundle)
       .then(results => {
-        results.should.eql(oldRepoData);
+        results.should.eql(mockData.oldRepoData);
         done();
       })
       .catch(done);
@@ -158,11 +60,11 @@ describe('Repositories Tests', () => {
         query: query.repoListQuery(100),
         variables: { userName: 'user001'},
       })
-      .reply(200, JSON.stringify(oldRepoQuery));
+      .reply(200, JSON.stringify(mockData.oldRepoQuery));
 
       appTester(App.resources.repository.list.operation.perform, bundle)
       .then(results => {
-        results.should.eql(oldRepoData);
+        results.should.eql(mockData.oldRepoData);
         done();
       })
       .catch(done);
@@ -185,7 +87,7 @@ describe('Repositories Tests', () => {
         query: query.repoListQuery(20),
         variables: { userName: 'user001'},
       })
-      .reply(200, JSON.stringify(oldRepoQuery));
+      .reply(200, JSON.stringify(mockData.oldRepoQuery));
 
       appTester(App.resources.repository.list.operation.perform, bundle)
       .then(results => {
@@ -212,11 +114,11 @@ describe('Repositories Tests', () => {
         query: query.repoListQuery(20),
         variables: { userName: 'user001'},
       })
-      .reply(200, JSON.stringify(newRepoQuery));
+      .reply(200, JSON.stringify(mockData.newRepoQuery));
 
       appTester(App.resources.repository.list.operation.perform, bundle)
       .then(results => {
-        results.should.eql(newRepoData);
+        results.should.eql(mockData.newRepoData);
         done();
       })
       .catch(done);
