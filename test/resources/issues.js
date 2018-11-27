@@ -12,21 +12,8 @@ zapier.tools.env.inject();
 const query = require('../../resources/queries/issue_queries');
 const mockData = require('../mock_data/issues_data');
 
-describe('My App', () => {
-  it('should run resources.issues', done => {
-    const bundle = { inputData: {} };
-
-    appTester(App.resources.issues.list.operation.perform, bundle)
-      .then(results => {
-        should.exist(results);
-        done();
-      })
-      .catch(done);
-  });
-});
-
 describe('Issues trigger tests', () => {
-  it('should return a list of issues', done => {
+  it('should fetch 100 issues on frontend test', done => {
     const bundle = {
       meta: {
         frontend: true,
@@ -40,10 +27,10 @@ describe('Issues trigger tests', () => {
 
     nock('https://api.github.com')
     .post('/graphql', {
-      query: query.issuesListQuery(),
+      query: query.issuesListQuery(100),
       variables: { userName: 'user001'},
     })
-    .reply(200, JSON.stringify(mockData.newIssueResponse));
+    .reply(200, JSON.stringify(mockData.newIssueQueryResponse));
 
     appTester(App.resources.issues.list.operation.perform, bundle)
     .then(results => {
@@ -52,4 +39,85 @@ describe('Issues trigger tests', () => {
     })
     .catch(done);
   });
+
+  it('should fetch 100 repos on first_poll', done => {
+    const bundle = {
+      meta: {
+        frontend: false,
+        first_poll: true,
+      },
+      authData: {
+        access_token: 'a_token',
+        login: 'user001'
+      }
+    };
+
+    nock('https://api.github.com')
+    .post('/graphql', {
+      query: query.issuesListQuery(100),
+      variables: { userName: 'user001'},
+    })
+    .reply(200, JSON.stringify(mockData.newIssueQueryResponse));
+
+    appTester(App.resources.issues.list.operation.perform, bundle)
+    .then(results => {
+      results.should.eql(mockData.newIssueData);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('should not return repo more than 48hrs old on standard_poll', done => {
+    const bundle = {
+      meta: {
+        frontend: false,
+        first_poll: false,
+      },
+      authData: {
+        access_token: 'a_token',
+        login: 'user001'
+      }
+    };
+
+    nock('https://api.github.com')
+    .post('/graphql', {
+      query: query.issuesListQuery(20),
+      variables: { userName: 'user001'},
+    })
+    .reply(200, JSON.stringify(mockData.oldIssueQueryResponse));
+
+    appTester(App.resources.issues.list.operation.perform, bundle)
+    .then(results => {
+      results.should.eql([]);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('should return repo less than 48hrs old on standard_poll', done => {
+    const bundle = {
+      meta: {
+        frontend: false,
+        first_poll: false,
+      },
+      authData: {
+        access_token: 'a_token',
+        login: 'user001'
+      }
+    };
+
+    nock('https://api.github.com')
+    .post('/graphql', {
+      query: query.issuesListQuery(20),
+      variables: { userName: 'user001'},
+    })
+    .reply(200, JSON.stringify(mockData.newIssueQueryResponse));
+
+    appTester(App.resources.issues.list.operation.perform, bundle)
+    .then(results => {
+      results.should.eql(mockData.newIssueData);
+      done();
+    })
+    .catch(done);
+  })
 });

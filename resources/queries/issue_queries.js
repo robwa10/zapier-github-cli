@@ -3,11 +3,11 @@
  */
 
 // Fetch list of issues.
-const issuesListQuery = () => {
+const issuesListQuery = (fetchAmount) => {
   return `
     query($userName:String!) {
       user(login:$userName) {
-        issues(first:100, orderBy: {
+        issues(first:${fetchAmount}, orderBy: {
           direction: DESC,
           field: CREATED_AT
         }) {
