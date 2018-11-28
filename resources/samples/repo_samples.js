@@ -20,7 +20,7 @@ samples.repoTriggerSample = {
 };
 
 samples.repoSearchSample = {
-  name: 'Sample Search Repo',
+  name: 'sample-search-repo',
   id: '1234',
   createdAt: '2018-09-16T18:57:48Z',
   description: 'A fake description.',

@@ -11,11 +11,14 @@ zapier.tools.env.inject();
 // Imported Test Data
 const query = require('../../resources/queries/repo_queries');
 const mockData = require('../mock_data/repo_data');
+const samples = require('../../resources/samples/repo_samples');
+
+const TEST_URL = 'https://api.github.com';
 
 
 
 describe('Repositories Tests', () => {
-  describe('New repository trigger', () => {
+  describe('Repository trigger', () => {
     it('should fetch 100 repos on frontend test', done => {
       const bundle = {
         meta: {
@@ -28,10 +31,10 @@ describe('Repositories Tests', () => {
         }
       };
 
-      nock('https://api.github.com')
+      nock(TEST_URL)
       .post('/graphql', {
         query: query.repoListQuery(100),
-        variables: { userName: 'user001'},
+        variables: { userName: 'user001' },
       })
       .reply(200, JSON.stringify(mockData.oldRepoQuery));
 
@@ -55,10 +58,10 @@ describe('Repositories Tests', () => {
         }
       };
 
-      nock('https://api.github.com')
+      nock(TEST_URL)
       .post('/graphql', {
         query: query.repoListQuery(100),
-        variables: { userName: 'user001'},
+        variables: { userName: 'user001' },
       })
       .reply(200, JSON.stringify(mockData.oldRepoQuery));
 
@@ -82,10 +85,10 @@ describe('Repositories Tests', () => {
         }
       };
 
-      nock('https://api.github.com')
+      nock(TEST_URL)
       .post('/graphql', {
         query: query.repoListQuery(20),
-        variables: { userName: 'user001'},
+        variables: { userName: 'user001' },
       })
       .reply(200, JSON.stringify(mockData.oldRepoQuery));
 
@@ -109,16 +112,102 @@ describe('Repositories Tests', () => {
         }
       };
 
-      nock('https://api.github.com')
+      nock(TEST_URL)
       .post('/graphql', {
         query: query.repoListQuery(20),
-        variables: { userName: 'user001'},
+        variables: { userName: 'user001' },
       })
       .reply(200, JSON.stringify(mockData.newRepoQuery));
 
       appTester(App.resources.repository.list.operation.perform, bundle)
       .then(results => {
         results.should.eql(mockData.newRepoData);
+        done();
+      })
+      .catch(done);
+    });
+  });
+
+  describe('Repository search', () => {
+    it('should search for a repo with the login name', done => {
+      const bundle = {
+        authData: {
+          access_token: 'a_token',
+          login: 'user001'
+        },
+        inputData: {
+          repoName: 'sample-search-repo'
+        }
+      };
+
+      nock(TEST_URL)
+      .post('/graphql', {
+        query: query.findRepoQuery,
+        variables: { repoOwner: 'user001', repoName: 'sample-search-repo' },
+      })
+      .reply(200, JSON.stringify(mockData.repoSearchResponse))
+
+      appTester(App.resources.repository.search.operation.perform, bundle)
+      .then(results => {
+        results.should.eql([samples.repoSearchSample]);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should search for a repo with the owner name', done => {
+      const bundle = {
+        authData: {
+          access_token: 'a_token',
+          login: 'user001'
+        },
+        inputData: {
+          repoName: 'sample-search-repo',
+          owner: 'johnDoe'
+        }
+      };
+
+      nock(TEST_URL)
+      .post('/graphql', {
+        query: query.findRepoQuery,
+        variables: { repoOwner: 'johnDoe', repoName: 'sample-search-repo' }
+      })
+      .reply(200, JSON.stringify(mockData.repoSearchResponse))
+
+      appTester(App.resources.repository.search.operation.perform, bundle)
+      .then(results => {
+        results.should.eql([samples.repoSearchSample]);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should return an empty object on no match', done => {
+      const bundle = {
+        authData: {
+          access_token: 'a_token',
+          login: 'user001'
+        },
+        inputData: {
+          repoName: 'sample-search-repo',
+          owner: 'johnDoe'
+        }
+      };
+
+      nock(TEST_URL)
+      .post('/graphql', {
+        query: query.findRepoQuery,
+        variables: { repoOwner: 'johnDoe', repoName: 'sample-search-repo' }
+      })
+      .reply(200, JSON.stringify({
+        data: {
+          repository: null
+        }
+      }))
+
+      appTester(App.resources.repository.search.operation.perform, bundle)
+      .then(results => {
+        results.should.eql([{}]);
         done();
       })
       .catch(done);
