@@ -15,6 +15,7 @@
     "npm": ">=5.6.0"
   },
   "dependencies": {
+    "prettier": "^1.15.2",
     "querystring": "^0.2.0",
     "zapier-platform-core": "7.4.0"
   },
