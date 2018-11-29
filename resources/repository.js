@@ -1,7 +1,9 @@
 // Dependencies
 const queries = require("./queries/repo_queries");
-const helpers = require("./utils/helpers");
 const samples = require("./samples/repo_samples");
+
+// Helper dependencies
+const helpers = require("./utils/helpers");
 
 // Fetch a list of repositorys
 const listRepositories = (z, bundle) => {
@@ -15,20 +17,11 @@ const listRepositories = (z, bundle) => {
     helpers.handleError(response); // Check for errors and deal with them
     const content = z.JSON.parse(response.content); // Parse the content and get the array of nodes
     const edges = content.data.user.repositories.edges;
+    const nodes = edges.map(el => el.node);
 
-    if (bundle.meta.frontend || bundle.meta.first_poll) {
-      return edges.map(el => el.node); // Return everything in trigger test or when building dedupe list
-    } else {
-      // Return only repos created in the last 48hrs in standard poll
-      let data = [];
-      edges.forEach(el => {
-        let node = helpers.createdLastTwoDays(el);
-        if (node !== null) {
-          data.push(node);
-        }
-      });
-      return data;
-    }
+    return bundle.meta.frontend || bundle.meta.first_poll
+      ? nodes // Return everything in trigger test or when building dedupe list
+      : nodes.filter(el => helpers.isTwoDaysOld(el.createdAt) === false); // Return only repos created in the last 48hrs in standard poll
   });
 };
 
