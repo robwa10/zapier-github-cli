@@ -3,7 +3,7 @@
  */
 
 // Fetch list of issues.
-const issuesListQuery = (fetchAmount) => {
+const issuesListQuery = fetchAmount => {
   return `
     query($userName:String!) {
       user(login:$userName) {
@@ -11,42 +11,38 @@ const issuesListQuery = (fetchAmount) => {
           direction: DESC,
           field: CREATED_AT
         }) {
-          edges {
-            node {
+          nodes {
+            id
+            title
+            createdAt
+            updatedAt
+            url
+            resourcePath
+            number
+            publishedAt
+            viewerSubscription
+            repository {
               id
-              title
-              createdAt
-              updatedAt
-              url
-              resourcePath
-              number
-              publishedAt
-              viewerSubscription
-              repository {
+              name
+            }
+            labels(first:100) {
+              nodes {
                 id
                 name
               }
-              labels(first:100) {
-                nodes {
-                  id
-                  name
-                }
-              }
-              assignees(first:100) {
-                edges {
-                  node {
-                    name
-                    id
-                  }
-                }
-              }
-              author {
-                login
-              }
-              body
-              bodyHTML
-              bodyText
             }
+            assignees(first:100) {
+              nodes {
+                name
+                id
+              }
+            }
+            author {
+              login
+            }
+            body
+            bodyHTML
+            bodyText
           }
         }
       }
@@ -54,5 +50,5 @@ const issuesListQuery = (fetchAmount) => {
 };
 
 module.exports = {
-  issuesListQuery: issuesListQuery,
-}
+  issuesListQuery: issuesListQuery
+};

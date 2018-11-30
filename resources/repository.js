@@ -16,8 +16,7 @@ const listRepositories = (z, bundle) => {
   return promise.then(response => {
     helpers.handleError(response); // Check for errors and deal with them
     const content = z.JSON.parse(response.content); // Parse the content and get the array of nodes
-    const edges = content.data.user.repositories.edges;
-    const nodes = edges.map(el => el.node);
+    const nodes = content.data.user.repositories.nodes;
 
     return bundle.meta.frontend || bundle.meta.first_poll
       ? nodes // Return everything in trigger test or when building dedupe list
@@ -40,14 +39,11 @@ const searchRepositories = (z, bundle) => {
     let repository = content.data.repository;
 
     if (repository === null) {
-      return [{}]; // Don't try and .map() null, just return it an empty object to show there's no match
+      return [{}]; // Return it an empty object to show there's no match
     } else {
-      // The data is very nested so let's map over edges of labels, languages and assignableUsers and return them as an array of objects
-      repository.labels = repository.labels.edges.map(el => el.node);
-      repository.languages = repository.languages.edges.map(el => el.node);
-      repository.collaborators = repository.collaborators.edges.map(
-        el => el.node
-      );
+      repository.labels = repository.labels.nodes;
+      repository.languages = repository.languages.nodes;
+      repository.collaborators = repository.collaborators.nodes;
 
       return [repository];
     }

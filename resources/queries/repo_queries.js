@@ -3,7 +3,7 @@
  */
 
 // Fetch list of repositorys.
-const repoListQuery = (fetchAmount) => {
+const repoListQuery = fetchAmount => {
   return `
     query($userName:String!) {
         user(login:$userName) {
@@ -11,8 +11,7 @@ const repoListQuery = (fetchAmount) => {
             direction: DESC,
             field: CREATED_AT })
             {
-            edges {
-              node {
+              nodes {
                 id
                 name
                 createdAt
@@ -34,9 +33,8 @@ const repoListQuery = (fetchAmount) => {
               }
             }
           }
-        }
       }`;
-}
+};
 
 const findRepoQuery = `
   query( $repoName:String!, $repoOwner:String!) {
@@ -55,38 +53,32 @@ const findRepoQuery = `
       sshUrl
       url
       languages(first:20) {
-        edges {
-          node {
-            id
-            name
-          }
+        nodes {
+          id
+          name
         }
       }
       labels(first:20) {
-        edges {
-          node {
-            id
-            color
-            name
-            resourcePath
-            url
-          }
+        nodes {
+          id
+          color
+          name
+          resourcePath
+          url
         }
       }
       collaborators(first:20) {
-        edges {
-          node {
-            email
-            name
-            login
-            url
-          }
+        nodes {
+          email
+          name
+          login
+          url
         }
       }
     }
   }`;
 
 module.exports = {
-    repoListQuery: repoListQuery,
-    findRepoQuery: findRepoQuery,
+  repoListQuery: repoListQuery,
+  findRepoQuery: findRepoQuery
 };

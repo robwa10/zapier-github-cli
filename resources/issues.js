@@ -5,17 +5,18 @@ const queries = require("./queries/issue_queries");
 // Helper dependencies
 const helpers = require("./utils/helpers");
 
-const mapSubNodes = nodes => {
-  return nodes.map(el => {
-    el.labels = el.labels.nodes;
-    el.assignees = el.assignees.nodes;
-    el.author = el.author.login;
-    return el;
-  });
-};
+// Get a list of issues
+const listIssues = (z, bundle) => {
+  // Reduce the data nesting from the response
+  const mapSubNodes = nodes => {
+    return nodes.map(el => {
+      el.labels = el.labels.nodes;
+      el.assignees = el.assignees.nodes;
+      el.author = el.author.login;
+      return el;
+    });
+  };
 
-// get a list of issuess
-const listIssuess = (z, bundle) => {
   const amount = bundle.meta.frontend || bundle.meta.first_poll ? 100 : 20; // Get the max number we can on dedupe and testing in editor
   const query = queries.issuesListQuery(amount);
   const variables = { userName: bundle.authData.login };
@@ -26,8 +27,7 @@ const listIssuess = (z, bundle) => {
     helpers.handleError(response);
 
     const content = z.JSON.parse(response.content);
-    const edges = content.data.user.issues.edges;
-    const nodes = edges.map(el => el.node);
+    const nodes = content.data.user.issues.nodes;
 
     if (bundle.meta.frontend || bundle.meta.first_poll) {
       return mapSubNodes(nodes); // Return everything in trigger test or when building dedupe list
@@ -40,13 +40,13 @@ const listIssuess = (z, bundle) => {
   });
 };
 
-// find a particular issues by name
+// Find a particular issue by name
 const searchIssues = (z, bundle) => {
   return [];
 };
 
-// create a issues
-const createIssues = (z, bundle) => {
+// Create an issue
+const createIssue = (z, bundle) => {
   return [];
 };
 
@@ -60,13 +60,13 @@ module.exports = {
       description: "Triggers when a new issue is created."
     },
     operation: {
-      perform: listIssuess
+      perform: listIssues
     }
   },
 
   search: {
     display: {
-      label: "Find Issues",
+      label: "Find Issue",
       description: "Finds a spsecific issue."
     },
     operation: {
@@ -77,12 +77,50 @@ module.exports = {
 
   create: {
     display: {
-      label: "Create Issues",
+      label: "Create Issue",
       description: "Creates a new issue."
     },
     operation: {
-      inputFields: [{ key: "name", required: true }],
-      perform: createIssues
+      inputFields: [
+        {
+          key: "repo_id",
+          required: true,
+          label: "Repo",
+          helpText:
+            'You may need to click "load more" in the dropdown if you have a lot of repos.',
+          dynamic: "repositoryList.id.name"
+        },
+        {
+          key: "title",
+          required: true,
+          label: "Title"
+        },
+        {
+          key: "body",
+          required: false,
+          label: "Body"
+        },
+        {
+          key: "assignee",
+          required: false,
+          label: "Assignee",
+          helpText: "Please enter a repo first."
+        },
+        {
+          key: "milestone",
+          required: false,
+          label: "Milestone",
+          helpText: "Please enter a repo first."
+        },
+        {
+          key: "labels",
+          required: false,
+          label: "Labels",
+          helpText:
+            "Labels must exist already. Can include multiple labels by typing in and using a comma as a separator. Capitalization matters! **You must have push access to set labels!**"
+        }
+      ],
+      perform: createIssue
     }
   }
 };
