@@ -5,23 +5,49 @@ const samples = require("./samples/repo_samples");
 // Helper dependencies
 const helpers = require("./utils/helpers");
 
+// Custom request for dynamic dropdowns for needing repo id and name
+const repoDynamicDropdown = async (z, bundle) => {
+  let cursor, variables, query;
+
+  // Set the variables based on whether it's the first request for the dropdown or not
+  if (bundle.meta.page) {
+    cursor = await z.cursor.get();
+    variables = { userName: bundle.authData.login, endCursor: cursor };
+    query = queries.paginationQuery;
+  } else {
+    variables = { userName: bundle.authData.login };
+    query = queries.dynamicDropdownQuery;
+  }
+
+  const response = await helpers.queryPromise(z, query, variables);
+  const content = z.JSON.parse(response.content);
+
+  // Stop setting endCursor when we've fetched everything
+  if (content.data.user.repositories.pageInfo.hasNextPage) {
+    await z.cursor.set(content.data.user.repositories.pageInfo.endCursor);
+  }
+  return content.data.user.repositories.nodes;
+};
+
 // Fetch a list of repositorys
-const listRepositories = (z, bundle) => {
-  const amount = bundle.meta.frontend || bundle.meta.first_poll ? 100 : 20; // Get the max number we can on dedupe and testing in editor
-  const query = queries.repoListQuery(amount);
-  const variables = { userName: bundle.authData.login };
+const listRepositories = async (z, bundle) => {
+  if (bundle.meta.prefill) {
+    return repoDynamicDropdown(z, bundle);
+  } else {
+    const amount = bundle.meta.frontend || bundle.meta.first_poll ? 100 : 20; // Get the max number we can on dedupe and testing in editor
+    const query = queries.repoListQuery(amount);
+    const variables = { userName: bundle.authData.login };
 
-  const promise = helpers.queryPromise(z, query, variables);
+    const response = await helpers.queryPromise(z, query, variables);
 
-  return promise.then(response => {
     helpers.handleError(response); // Check for errors and deal with them
     const content = z.JSON.parse(response.content); // Parse the content and get the array of nodes
     const nodes = content.data.user.repositories.nodes;
 
     return bundle.meta.frontend || bundle.meta.first_poll
-      ? nodes // Return everything in trigger test or when building dedupe list
+      ? nodes // Return everything in trigger test, when building dedupe list or populating dropdown
       : nodes.filter(el => helpers.isTwoDaysOld(el.createdAt) === false); // Return only repos created in the last 48hrs in standard poll
-  });
+  }
 };
 
 // Find a specific repository
@@ -62,6 +88,7 @@ module.exports = {
     operation: {
       type: "polling",
       perform: listRepositories,
+      canPaginate: true,
       sample: samples.repoTriggerSample
     }
   },
