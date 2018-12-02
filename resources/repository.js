@@ -51,29 +51,27 @@ const listRepositories = async (z, bundle) => {
 };
 
 // Find a specific repository
-const searchRepositories = (z, bundle) => {
+const searchRepositories = async (z, bundle) => {
   // Check if Organization or User Name included, if not default to authed login
   const repoOwner = bundle.inputData.owner || bundle.authData.login;
   const query = queries.findRepoQuery;
   const variables = { repoOwner, repoName: bundle.inputData.repoName };
 
-  const promise = helpers.queryPromise(z, query, variables);
+  const response = await helpers.queryPromise(z, query, variables);
 
-  return promise.then(response => {
-    helpers.handleError(response);
-    const content = z.JSON.parse(response.content);
-    let repository = content.data.repository;
+  helpers.handleError(response);
+  const content = z.JSON.parse(response.content);
+  let repository = content.data.repository;
 
-    if (repository === null) {
-      return [{}]; // Return it an empty object to show there's no match
-    } else {
-      repository.labels = repository.labels.nodes;
-      repository.languages = repository.languages.nodes;
-      repository.collaborators = repository.collaborators.nodes;
+  if (repository === null) {
+    return [{}]; // Return it an empty object to show there's no match
+  } else {
+    repository.labels = repository.labels.nodes;
+    repository.languages = repository.languages.nodes;
+    repository.collaborators = repository.collaborators.nodes;
 
-      return [repository];
-    }
-  });
+    return [repository];
+  }
 };
 
 module.exports = {

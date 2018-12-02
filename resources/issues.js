@@ -6,7 +6,7 @@ const queries = require("./queries/issue_queries");
 const helpers = require("./utils/helpers");
 
 // Get a list of issues
-const listIssues = (z, bundle) => {
+const listIssues = async (z, bundle) => {
   // Reduce the data nesting from the response
   const mapSubNodes = nodes => {
     return nodes.map(el => {
@@ -21,23 +21,21 @@ const listIssues = (z, bundle) => {
   const query = queries.issuesListQuery(amount);
   const variables = { userName: bundle.authData.login };
 
-  const promise = helpers.queryPromise(z, query, variables);
+  const response = await helpers.queryPromise(z, query, variables);
 
-  return promise.then(response => {
-    helpers.handleError(response);
+  helpers.handleError(response);
 
-    const content = z.JSON.parse(response.content);
-    const nodes = content.data.user.issues.nodes;
+  const content = z.JSON.parse(response.content);
+  const nodes = content.data.user.issues.nodes;
 
-    if (bundle.meta.frontend || bundle.meta.first_poll) {
-      return mapSubNodes(nodes); // Return everything in trigger test or when building dedupe list
-    } else {
-      const data = nodes.filter(
-        el => helpers.isTwoDaysOld(el.createdAt) === false
-      ); // Return only issues created in the last 48hrs in standard poll
-      return mapSubNodes(data);
-    }
-  });
+  if (bundle.meta.frontend || bundle.meta.first_poll) {
+    return mapSubNodes(nodes); // Return everything in trigger test or when building dedupe list
+  } else {
+    const data = nodes.filter(
+      el => helpers.isTwoDaysOld(el.createdAt) === false
+    ); // Return only issues created in the last 48hrs in standard poll
+    return mapSubNodes(data);
+  }
 };
 
 // Find a particular issue by name
