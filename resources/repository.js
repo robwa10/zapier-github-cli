@@ -3,7 +3,7 @@ const queries = require("./queries/repo_queries");
 const samples = require("./samples/repo_samples");
 
 // Helper dependencies
-const helpers = require("./utils/helpers");
+const helpers = require("./helpers");
 
 // Custom request for dynamic dropdowns for needing repo id and name
 const repoDynamicDropdown = async (z, bundle) => {

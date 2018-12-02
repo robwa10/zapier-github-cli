@@ -3,7 +3,7 @@ const queries = require("./queries/issue_queries");
 // const samples = require('./samples/issue_samples');
 
 // Helper dependencies
-const helpers = require("./utils/helpers");
+const helpers = require("./helpers");
 
 // Get a list of issues
 const listIssues = async (z, bundle) => {
