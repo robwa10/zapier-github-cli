@@ -15,15 +15,14 @@
     "npm": ">=5.6.0"
   },
   "dependencies": {
-    "eslint-config-prettier": "^3.3.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "prettier": "^1.15.2",
     "querystring": "^0.2.0",
     "zapier-platform-core": "7.4.0"
   },
   "devDependencies": {
     "mocha": "^5.2.0",
     "nock": "^10.0.2",
-    "should": "^13.2.0"
+    "prettier": "^1.15.2",
+    "should": "^13.2.0",
+    "zapier-scripts": "^2.1.0"
   }
 }
