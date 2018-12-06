@@ -1,7 +1,8 @@
-// Dependencies
-const IssuesResource = require('./resources/issues');
-const RepositoryResource = require('./resources/repository');
-const authentication = require('./authentication');
+const LabelsResource = require("./resources/labels");
+const IssuesResource = require("./resources/issues");
+const RepositoryResource = require("./resources/repository");
+const authentication = require("./authentication");
+const dropdown_requests = require("./resources/dropdown_requests");
 
 // To include the Authorization header on all outbound requests, simply define a function here.
 // It runs runs before each request is sent out, allowing you to make tweaks to the request in a centralized spot
@@ -15,34 +16,21 @@ const includeBearerToken = (request, z, bundle) => {
 const App = {
   // This is just shorthand to reference the installed dependencies you have. Zapier will
   // need to know these before we can upload
-  version: require('./package.json').version,
-  platformVersion: require('zapier-platform-core').version,
+  version: require("./package.json").version,
+  platformVersion: require("zapier-platform-core").version,
 
   authentication: authentication,
 
-  beforeRequest: [
-    includeBearerToken
-  ],
-
-  afterResponse: [
-  ],
+  beforeRequest: [includeBearerToken],
 
   resources: {
+    [LabelsResource.key]: LabelsResource,
     [IssuesResource.key]: IssuesResource,
-    [RepositoryResource.key]: RepositoryResource,
+    [RepositoryResource.key]: RepositoryResource
   },
 
-  // If you want your trigger to show up, you better include it here!
-  triggers: {
-  },
-
-  // If you want your searches to show up, you better include it here!
-  searches: {
-  },
-
-  // If you want your creates to show up, you better include it here!
-  creates: {
-  }
+  // This is where we're holding all the special requests to populate the various dropdowns throughout the app that don't have a resource
+  triggers: dropdown_requests
 };
 
 // Finally, export the app.
