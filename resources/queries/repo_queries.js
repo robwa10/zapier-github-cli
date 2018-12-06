@@ -2,23 +2,6 @@
  * Github limits results to 100.
  */
 
-// First query to populate a repo dynamic dropdown
-const dynamicDropdownQuery = `
-   query($userName:String!) {
-     user(login:$userName) {
-       repositories(first:100, orderBy: { direction: DESC, field: CREATED_AT }) {
-         pageInfo {
-           endCursor
-           hasNextPage
-         }
-         nodes {
-           id
-           name
-         }
-       }
-     }
-   }`;
-
 // Find a specific repo
 const findRepoQuery = `
  query( $repoName:String!, $repoOwner:String!) {
@@ -62,23 +45,6 @@ const findRepoQuery = `
    }
  }`;
 
-// Pagination query to fetch more resources for a repo dynamic dropdown
-const paginationQuery = `
-  query($userName:String!, $endCursor:String!) {
-   user(login:$userName) {
-     repositories(first:100, after:$endCursor, orderBy: { direction: DESC, field: CREATED_AT }) {
-       pageInfo {
-         endCursor
-         hasNextPage
-       }
-       nodes {
-         id
-         name
-       }
-     }
-   }
-  }`;
-
 // Fetch list of repositorys
 const repoListQuery = fetchAmount => {
   return `
@@ -111,8 +77,6 @@ const repoListQuery = fetchAmount => {
 };
 
 module.exports = {
-  dynamicDropdownQuery,
   findRepoQuery,
-  paginationQuery,
   repoListQuery
 };
