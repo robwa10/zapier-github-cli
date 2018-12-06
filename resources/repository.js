@@ -1,38 +1,34 @@
 // Dependencies
 const queries = require("./queries/repo_queries");
+const dropdownQueries = require("./queries/dropdown_queries");
 const samples = require("./samples/repo_samples");
 
 // Helper dependencies
 const helpers = require("./helpers");
 
-// Custom request for dynamic dropdowns for needing repo id and name
-const repoDynamicDropdown = async (z, bundle) => {
-  let cursor, variables, query;
-
-  // Set the variables based on whether it's the first request for the dropdown or not
-  if (bundle.meta.page) {
-    cursor = await z.cursor.get();
-    variables = { userName: bundle.authData.login, endCursor: cursor };
-    query = queries.paginationQuery;
-  } else {
-    variables = { userName: bundle.authData.login };
-    query = queries.dynamicDropdownQuery;
-  }
-
-  const response = await helpers.queryPromise(z, query, variables);
-  const content = z.JSON.parse(response.content);
-
-  // Stop setting endCursor when we've fetched everything
-  if (content.data.user.repositories.pageInfo.hasNextPage) {
-    await z.cursor.set(content.data.user.repositories.pageInfo.endCursor);
-  }
-  return content.data.user.repositories.nodes;
-};
-
 // Fetch a list of repositorys
 const listRepositories = async (z, bundle) => {
   if (bundle.meta.prefill) {
-    return repoDynamicDropdown(z, bundle);
+    let cursor, variables, query;
+
+    // Set the variables based on whether it's the first request for the dropdown or not
+    if (bundle.meta.page) {
+      cursor = await z.cursor.get();
+      variables = { userName: bundle.authData.login, endCursor: cursor };
+      query = dropdownQueries.repoDropdownPaginationQuery;
+    } else {
+      variables = { userName: bundle.authData.login };
+      query = dropdownQueries.repoDropdownQuery;
+    }
+
+    const response = await helpers.queryPromise(z, query, variables);
+    const content = z.JSON.parse(response.content);
+
+    // Stop setting endCursor when we've fetched everything
+    if (content.data.user.repositories.pageInfo.hasNextPage) {
+      await z.cursor.set(content.data.user.repositories.pageInfo.endCursor);
+    }
+    return content.data.user.repositories.nodes;
   } else {
     const amount = bundle.meta.frontend || bundle.meta.first_poll ? 100 : 20; // Get the max number we can on dedupe and testing in editor
     const query = queries.repoListQuery(amount);
@@ -50,7 +46,7 @@ const listRepositories = async (z, bundle) => {
   }
 };
 
-// Find a specific repository
+// Find a specific repository;
 const searchRepositories = async (z, bundle) => {
   // Check if Organization or User Name included, if not default to authed login
   const repoOwner = bundle.inputData.owner || bundle.authData.login;
@@ -69,6 +65,7 @@ const searchRepositories = async (z, bundle) => {
     repository.labels = repository.labels.nodes;
     repository.languages = repository.languages.nodes;
     repository.collaborators = repository.collaborators.nodes;
+    repository.assignableUsers = repository.assignableUsers.nodes;
 
     return [repository];
   }
