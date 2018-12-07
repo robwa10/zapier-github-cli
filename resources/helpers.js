@@ -17,6 +17,19 @@ const isTwoDaysOld = timeStamp => {
   return difference < 172800000 ? false : true; // 172800000 is the number of milliseconds in 48hrs
 };
 
+const mutationPromise = (z, mutation, queryVariables) => {
+  return z.request(`{{process.env.BASE_URL}}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/vnd.github.starfire-preview+json"
+    },
+    body: z.JSON.stringify({
+      query: mutation
+    })
+  });
+};
+
 const queryPromise = (z, query, queryVariables) => {
   return z.request(`{{process.env.BASE_URL}}`, {
     method: "POST",
@@ -31,5 +44,6 @@ const queryPromise = (z, query, queryVariables) => {
 module.exports = {
   handleError,
   isTwoDaysOld,
+  mutationPromise,
   queryPromise
 };

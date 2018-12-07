@@ -1,5 +1,6 @@
 // Dependencies
 const queries = require("./queries/issue_queries");
+const mutations = require("./mutations/issue_mutations");
 // const samples = require('./samples/issue_samples');
 
 // Helper dependencies
@@ -44,8 +45,50 @@ const searchIssues = (z, bundle) => {
 };
 
 // Create an issue
-const createIssue = (z, bundle) => {
-  return [];
+const createIssue = async (z, bundle) => {
+  // First we need to get the repo id
+  const query = `
+    query( $repoName:String!, $repoOwner:String!) {
+      repository(name:$repoName, owner:$repoOwner) {
+        name
+        id
+      }
+    }
+  `;
+  const getRepoID = await helpers.queryPromise(z, query, {
+    repoName: bundle.inputData.repo_name,
+    repoOwner: bundle.inputData.repo_owner || bundle.authData.login
+  });
+  const repoContent = z.JSON.parse(getRepoID.content);
+  const repo_id = repoContent.data.repository.id;
+
+  // Now we need to build inputs of the mutation query based on the inputData
+  let inputs = `repositoryId:"${repo_id}" title:"${
+    bundle.inputData.issue_title
+  }"`;
+
+  // Check which optional fields were used and add them
+  if (bundle.inputData.issue_body) {
+    inputs = inputs + ` body:"${bundle.inputData.issue_body}"`;
+  }
+  if (bundle.inputData.issue_assignee) {
+    inputs = inputs + ` assigneeIds:[${bundle.inputData.issue_assignee}]`;
+  }
+  if (bundle.inputData.issue_milestone) {
+    inputs = inputs + ` milestoneId:"${bundle.inputData.issue_milestone}"`;
+  }
+  if (bundle.inputData.issue_labels) {
+    inputs = inputs + ` labelIds:[${bundle.inputData.issue_labels}]`;
+  }
+
+  // Now we can create the issue on the repo!
+  const mutation = mutations.createIssue(inputs);
+  const response = await helpers.mutationPromise(z, mutation);
+  const content = z.JSON.parse(response.content);
+  let newIssue = content.data.createIssue.issue;
+  newIssue.author = newIssue.author.login; // This just looks nicer in the output data
+
+  return newIssue;
 };
 
 module.exports = {
@@ -81,41 +124,55 @@ module.exports = {
     operation: {
       inputFields: [
         {
-          key: "repo_id",
+          key: "repo_name",
           required: true,
           label: "Repo",
           helpText:
-            'You may need to click "load more" in the dropdown if you have a lot of repos.',
-          dynamic: "repositoryList.id.name"
+            'You may need to click "load more" in the dropdown if you have a lot of repos. **If you pass a Custom Value here it must be the repo Name, not the ID.**',
+          dynamic: "repositoryList.name"
         },
         {
-          key: "title",
-          required: true,
-          label: "Title"
-        },
-        {
-          key: "body",
+          key: "repo_owner",
           required: false,
-          label: "Body"
+          label: "Repo Owner",
+          helpText:
+            "You only need to use this if you're creating an issue on a repo you don't own. **You must pass the repo owner's login name**."
         },
         {
-          key: "assignee",
+          key: "issue_title",
+          required: true,
+          label: "Title",
+          type: "string"
+        },
+        {
+          key: "issue_body",
+          required: false,
+          label: "Body",
+          type: "text"
+        },
+        {
+          key: "issue_assignee",
           required: false,
           label: "Assignee",
-          helpText: "Please enter a repo first."
+          helpText:
+            "Please enter a repo first. **If you pass a Custom Value here it has to be the assignee's ID**.",
+          dynamic: "repo_assignees.id.login"
         },
         {
-          key: "milestone",
+          key: "issue_milestone",
           required: false,
           label: "Milestone",
-          helpText: "Please enter a repo first."
+          helpText:
+            "Please enter a repo first. **If you pass a Custom Value here it has to be the milestone ID**.",
+          dynamic: "get_milestones.id.title"
         },
         {
-          key: "labels",
+          key: "issue_labels",
           required: false,
+          list: true,
+          dynamic: "labelsList.id.name",
           label: "Labels",
-          helpText:
-            "Labels must exist already. Can include multiple labels by typing in and using a comma as a separator. Capitalization matters! **You must have push access to set labels!**"
+          helpText: "**If you pass a Custom Value it must be the label ID**."
         }
       ],
       perform: createIssue
