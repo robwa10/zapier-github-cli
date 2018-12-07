@@ -1,6 +1,104 @@
 const today = new Date();
 const currentISODate = today.toISOString();
 
+const createdIssueResponse = {
+  data: {
+    createIssue : {
+       issue: {
+         id: '1234Issue',
+         resourcePath: '/jondoe/test-repo/issues/1',
+         title: 'Test Issue',
+         url: 'https://github.com/jondoe/test-repo/issues/1',
+         state: 'OPEN',
+         body: 'Test issue body content.',
+         bodyText: 'Test issue body content.',
+         bodyHTML: '<p>Test issue body content.</p>',
+         createdAt: currentISODate,
+         number: 1,
+         author: {
+           login: 'jondoe',
+        },
+         repository: {
+           id: '1234',
+           name: 'test-repo'
+        },
+         labels: {
+           nodes: [
+            {
+               id: '1234labelA',
+               name: 'labelA'
+            },
+            {
+              id: '5678labelB',
+              name: 'labelB'
+            }
+          ]
+        },
+         assignees : {
+           nodes : [
+             {
+               id: '1234abc',
+               login: 'robwa10'
+             }
+           ]
+        },
+         milestone : {
+           id: '1234milestone',
+           title: 'Sample Milestone',
+           description: 'This is a sample milestone',
+           number: 1,
+           url: 'https://github.com/jondoe/test-repo/milestone/1'
+         }
+      }
+    }
+  }
+};
+
+const newCreatedIssue = {
+  id: '1234Issue',
+  resourcePath: '/jondoe/test-repo/issues/1',
+  title: 'Test Issue',
+  url: 'https://github.com/jondoe/test-repo/issues/1',
+  state: 'OPEN',
+  body: 'Test issue body content.',
+  bodyText: 'Test issue body content.',
+  bodyHTML: '<p>Test issue body content.</p>',
+  createdAt: currentISODate,
+  number: 1,
+  author: 'jondoe',
+  repository: {
+    id: '1234',
+    name: 'test-repo'
+ },
+  labels: {
+    nodes: [
+     {
+        id: '1234labelA',
+        name: 'labelA'
+     },
+     {
+       id: '5678labelB',
+       name: 'labelB'
+     }
+   ]
+ },
+  assignees : {
+    nodes : [
+      {
+        id: '1234abc',
+        login: 'robwa10'
+      }
+    ]
+ },
+  milestone : {
+    id: '1234milestone',
+    title: 'Sample Milestone',
+    description: 'This is a sample milestone',
+    number: 1,
+    url: 'https://github.com/jondoe/test-repo/milestone/1'
+  }
+}
+
 const newIssueQueryResponse = {
   data: {
     user: {
@@ -120,6 +218,8 @@ const oldIssueQueryResponse = {
 };
 
 module.exports = {
+  createdIssueResponse,
+  newCreatedIssue,
   newIssueQueryResponse,
   newIssueData,
   oldIssueQueryResponse

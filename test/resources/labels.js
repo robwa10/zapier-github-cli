@@ -1,4 +1,4 @@
-/* globals describe it */
+/* globals describe it
 const should = require('should');
 
 const zapier = require('zapier-platform-core');
@@ -20,3 +20,4 @@ describe('My App', () => {
       .catch(done);
   });
 });
+*/

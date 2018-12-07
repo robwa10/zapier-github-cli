@@ -65,7 +65,7 @@ const searchRepositories = async (z, bundle) => {
     repository.labels = repository.labels.nodes;
     repository.languages = repository.languages.nodes;
     repository.collaborators = repository.collaborators.nodes;
-    repository.assignableUsers = repository.assignableUsers.nodes;
+    // repository.assignableUsers = repository.assignableUsers.nodes;
 
     return [repository];
   }

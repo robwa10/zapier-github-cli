@@ -13,7 +13,7 @@ const query = require("../../resources/queries/repo_queries");
 const mockData = require("../mock_data/repo_data");
 const samples = require("../../resources/samples/repo_samples");
 
-describe("Repositories Trigger Tests", () => {
+describe("Repositories Trigger test", () => {
   it("should fetch 100 repos on frontend test", done => {
     const bundle = {
       meta: {
@@ -123,7 +123,7 @@ describe("Repositories Trigger Tests", () => {
   });
 });
 
-describe("Repository Search Test", () => {
+describe("Repository Search test", () => {
   it("should search for a repo with the login name", done => {
     const bundle = {
       authData: {

@@ -8,7 +8,7 @@ const appTester = zapier.createAppTester(App);
 
 const nock = require("nock");
 
-describe("oauth2 app", () => {
+describe("Authentication test", () => {
   before(() => {
     // It's a good idea to store your Client ID and Secret in the environment rather than in code.
     // This works locally via the `export` shell command and in production by using `zapier env`
