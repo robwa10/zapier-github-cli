@@ -2,7 +2,7 @@ const LabelsResource = require("./resources/labels");
 const IssuesResource = require("./resources/issues");
 const RepositoryResource = require("./resources/repository");
 const authentication = require("./authentication");
-const dropdown_requests = require("./resources/dropdown_requests");
+const dropdown_requests = require("./triggers/dropdown_requests");
 
 // To include the Authorization header on all outbound requests, simply define a function here.
 // It runs runs before each request is sent out, allowing you to make tweaks to the request in a centralized spot

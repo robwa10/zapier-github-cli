@@ -1,10 +1,10 @@
 // Dependencies
 const queries = require("./queries/repo_queries");
-const dropdownQueries = require("./queries/dropdown_queries");
+const dropdownQueries = require("../triggers/dropdown_queries");
 const samples = require("./samples/repo_samples");
 
 // Helper dependencies
-const helpers = require("./helpers");
+const helpers = require("../helpers");
 
 // Fetch a list of repositorys
 const listRepositories = async (z, bundle) => {
@@ -65,7 +65,7 @@ const searchRepositories = async (z, bundle) => {
     repository.labels = repository.labels.nodes;
     repository.languages = repository.languages.nodes;
     repository.collaborators = repository.collaborators.nodes;
-    // repository.assignableUsers = repository.assignableUsers.nodes;
+    // repository.assignableUsers = repository.assignableUsers.nodes; This needs to be added to the query
 
     return [repository];
   }

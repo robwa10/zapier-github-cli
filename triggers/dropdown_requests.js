@@ -1,6 +1,6 @@
 // Dependencies
-const helpers = require("./helpers");
-const queries = require("./queries/dropdown_queries");
+const helpers = require("../helpers");
+const queries = require("./dropdown_queries");
 
 // Custom request for dropdowns that need repo assignees
 const getDropdownAssignees = async (z, bundle) => {

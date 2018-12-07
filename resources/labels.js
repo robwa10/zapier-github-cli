@@ -1,6 +1,6 @@
 // Dependencies
-const helpers = require("./helpers");
-const dropdownQueries = require("./queries/dropdown_queries");
+const helpers = require("../helpers");
+const dropdownQueries = require("../triggers/dropdown_queries");
 
 // Get a list of labels on a repo for a dropdown
 const getLabelDropdownData = async (z, bundle) => {

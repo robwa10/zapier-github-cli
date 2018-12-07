@@ -4,7 +4,7 @@ const mutations = require("./mutations/issue_mutations");
 // const samples = require('./samples/issue_samples');
 
 // Helper dependencies
-const helpers = require("./helpers");
+const helpers = require("../helpers");
 
 // Get a list of issues
 const listIssues = async (z, bundle) => {
