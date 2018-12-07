@@ -1,6 +1,6 @@
 // Dependencies
 const helpers = require("../helpers");
-const queries = require("./dropdown_queries");
+const queries = require("./queries/milestone_queries");
 
 // Custom request for dropdowns that need milestones from repos
 const getMilestones = async (z, bundle) => {
@@ -34,19 +34,17 @@ const getMilestones = async (z, bundle) => {
 };
 
 module.exports = {
-  key: 'milestone',
-  noun: 'Milestone',
+  key: "milestone",
+  noun: "Milestone",
 
   display: {
-    label: 'Get Milestone',
-    description: 'Triggers on a new milestone.',
+    label: "Get Milestone",
+    description: "Triggers on a new milestone.",
     hidden: true
   },
 
   operation: {
-    inputFields: [
-
-    ],
+    inputFields: [],
     perform: getMilestones
   }
 };

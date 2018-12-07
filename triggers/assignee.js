@@ -1,6 +1,6 @@
 // Dependencies
 const helpers = require("../helpers");
-const queries = require("./dropdown_queries");
+const queries = require("./queries/assignee_queries");
 
 // Custom request for dropdowns that need repo assignees
 const getAssignees = async (z, bundle) => {
@@ -36,12 +36,12 @@ const getAssignees = async (z, bundle) => {
 };
 
 module.exports = {
-  key: 'assignee',
-  noun: 'Assignee',
+  key: "assignee",
+  noun: "Assignee",
 
   display: {
-    label: 'Get Assignee',
-    description: 'Triggers on a new assignee.',
+    label: "Get Assignee",
+    description: "Triggers on a new assignee.",
     hidden: true
   },
 

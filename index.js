@@ -37,7 +37,6 @@ const App = {
     [RepositoryResource.key]: RepositoryResource
   },
 
-  // This is where we're holding all the special requests to populate the various dropdowns throughout the app that don't have a resource
   triggers: {
     [AssigneeTrigger.key]: AssigneeTrigger,
     [MilestoneTrigger.key]: MilestoneTrigger,

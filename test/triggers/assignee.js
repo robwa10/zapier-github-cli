@@ -1,16 +1,28 @@
-/* globals describe it
-const should = require('should');
+/*
+// Module Imports
+const nock = require("nock");
+const should = require("should");
+const zapier = require("zapier-platform-core");
 
-const zapier = require('zapier-platform-core');
-
-// Use this to make test calls into your app:
-const App = require('../../index');
+// Use this to make test calls
+const App = require("../../index");
 const appTester = zapier.createAppTester(App);
 zapier.tools.env.inject();
 
-describe('My App', () => {
-  it('should run triggers.assignee', done => {
-    const bundle = { inputData: {} };
+// Imported data for testing
+
+
+describe('Assignee Trigger test', () => {
+  it('should get all assignees using login name', done => {
+    const bundle = { authData: 'user001' };
+
+    nock(`${process.env.TEST_URL}`)
+      .post("/graphql", {
+        query: ,
+        variables: {}
+      })
+      .reply(200, JSON.stringify());
+
 
     appTester(App.triggers.assignee.operation.perform, bundle)
       .then(results => {

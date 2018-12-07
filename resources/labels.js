@@ -1,6 +1,6 @@
 // Dependencies
 const helpers = require("../helpers");
-const dropdownQueries = require("../triggers/dropdown_queries");
+const queries = require("./queries/labels_queries");
 
 // Get a list of labels on a repo for a dropdown
 const getLabelDropdownData = async (z, bundle) => {
@@ -14,13 +14,13 @@ const getLabelDropdownData = async (z, bundle) => {
       repoOwner: bundle.inputData.repo_owner || bundle.authData.login,
       endCursor: cursor
     };
-    query = dropdownQueries.labelsDropdownPaginationQuery;
+    query = queries.labelsDropdownPaginationQuery;
   } else {
     variables = {
       repoName: bundle.inputData.repo_name,
       repoOwner: bundle.inputData.repo_owner || bundle.authData.login
     };
-    query = dropdownQueries.labelsDropdownQuery;
+    query = queries.labelsDropdownQuery;
   }
 
   const response = await helpers.queryPromise(z, query, variables);

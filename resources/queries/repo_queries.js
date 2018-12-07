@@ -45,6 +45,42 @@ const findRepoQuery = `
    }
  }`;
 
+// First query to populate a repo dynamic dropdown
+const repoDropdownQuery = `
+ 	query($userName:String!) {
+ 	 user(login:$userName) {
+ 	   repositories(first:100, orderBy: { direction: DESC, field: CREATED_AT }) {
+ 	     pageInfo {
+ 	       endCursor
+ 	       hasNextPage
+ 	     }
+ 	     nodes {
+ 	       id
+ 	       name
+ 	     }
+ 	   }
+ 	 }
+ 	}
+ `;
+
+// Pagination query to fetch more resources for a repo dynamic dropdown
+const repoDropdownPaginationQuery = `
+ 	query($userName:String!, $endCursor:String!) {
+ 		user(login:$userName) {
+ 		  repositories(first:100, after:$endCursor, orderBy: { direction: DESC, field: CREATED_AT }) {
+ 		    pageInfo {
+ 		      endCursor
+ 		      hasNextPage
+ 		    }
+ 		    nodes {
+ 		      id
+ 		      name
+ 		    }
+ 		  }
+ 		}
+ 	}
+ `;
+
 // Fetch list of repositorys
 const repoListQuery = fetchAmount => {
   return `
@@ -78,5 +114,7 @@ const repoListQuery = fetchAmount => {
 
 module.exports = {
   findRepoQuery,
+  repoDropdownQuery,
+  repoDropdownPaginationQuery,
   repoListQuery
 };

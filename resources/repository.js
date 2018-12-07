@@ -1,6 +1,5 @@
 // Dependencies
 const queries = require("./queries/repo_queries");
-const dropdownQueries = require("../triggers/dropdown_queries");
 const samples = require("./samples/repo_samples");
 
 // Helper dependencies
@@ -15,10 +14,10 @@ const listRepositories = async (z, bundle) => {
     if (bundle.meta.page) {
       cursor = await z.cursor.get();
       variables = { userName: bundle.authData.login, endCursor: cursor };
-      query = dropdownQueries.repoDropdownPaginationQuery;
+      query = queries.repoDropdownPaginationQuery;
     } else {
       variables = { userName: bundle.authData.login };
-      query = dropdownQueries.repoDropdownQuery;
+      query = queries.repoDropdownQuery;
     }
 
     const response = await helpers.queryPromise(z, query, variables);
