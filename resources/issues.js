@@ -108,7 +108,8 @@ module.exports = {
   search: {
     display: {
       label: "Find Issue",
-      description: "Finds a spsecific issue."
+      description: "Finds a spsecific issue.",
+      hidden: true
     },
     operation: {
       inputFields: [{ key: "name", required: true }],

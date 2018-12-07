@@ -72,7 +72,8 @@ module.exports = {
   list: {
     display: {
       label: "New Label",
-      description: "Lists the labels."
+      description: "Lists the labels.",
+      hidden: true
     },
     operation: {
       perform: listLabels,
@@ -83,7 +84,8 @@ module.exports = {
   search: {
     display: {
       label: "Find Label",
-      description: "Finds a label by searching."
+      description: "Finds a label by searching.",
+      hidden: true
     },
     operation: {
       inputFields: [{ key: "name", required: true }],
@@ -94,7 +96,8 @@ module.exports = {
   create: {
     display: {
       label: "Create Label",
-      description: "Creates a new labels."
+      description: "Creates a new labels.",
+      hidden: true
     },
     operation: {
       inputFields: [{ key: "name", required: true }],
