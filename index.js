@@ -1,9 +1,16 @@
-const LabelsResource = require("./resources/labels");
-const IssuesResource = require("./resources/issues");
-const RepositoryResource = require("./resources/repository");
 const authentication = require("./authentication");
-const dropdown_requests = require("./triggers/dropdown_requests");
+
+// Triggers
+const AssigneeTrigger = require('./triggers/assignee');
 const MentionTrigger = require('./triggers/mention');
+const MilestoneTrigger = require('./triggers/milestone');
+
+// Resources
+const IssuesResource = require("./resources/issues");
+const LabelsResource = require("./resources/labels");
+const RepositoryResource = require("./resources/repository");
+
+
 
 // To include the Authorization header on all outbound requests, simply define a function here.
 // It runs runs before each request is sent out, allowing you to make tweaks to the request in a centralized spot
@@ -32,8 +39,9 @@ const App = {
 
   // This is where we're holding all the special requests to populate the various dropdowns throughout the app that don't have a resource
   triggers: {
+    [AssigneeTrigger.key]: AssigneeTrigger,
+    [MilestoneTrigger.key]: MilestoneTrigger,
     [MentionTrigger.key]: MentionTrigger,
-    dropdown_requests
    }
 };
 

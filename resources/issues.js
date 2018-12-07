@@ -157,7 +157,7 @@ module.exports = {
           label: "Assignee",
           helpText:
             "Please enter a repo first. **If you pass a Custom Value here it has to be the assignee's ID**.",
-          dynamic: "repo_assignees.id.login"
+          dynamic: "assignee.id.login"
         },
         {
           key: "issue_milestone",
@@ -165,7 +165,7 @@ module.exports = {
           label: "Milestone",
           helpText:
             "Please enter a repo first. **If you pass a Custom Value here it has to be the milestone ID**.",
-          dynamic: "get_milestones.id.title"
+          dynamic: "milestone.id.title"
         },
         {
           key: "issue_labels",
