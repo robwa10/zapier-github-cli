@@ -1,6 +1,0 @@
-*.min.js
-node_modules/
-package.json
-
-# build directories
-dist/
